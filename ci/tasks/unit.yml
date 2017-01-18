@@ -1,7 +1,7 @@
 ---
 platform: linux
 
-image: docker:///datianshi/gradle
+image_resource: docker:///datianshi/gradle
 
 inputs:
   - name: music-repo
