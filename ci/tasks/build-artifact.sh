@@ -8,3 +8,4 @@ echo $version
 gradle assemble -PVersion=$version
 pwd
 ls build/libs/
+cp build/libs/spring-music-*.war build-output/.
