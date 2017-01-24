@@ -2,13 +2,16 @@ resources:
 - name: music-repo
   type: git
   source:
-    uri: git@github.com:datianshi/spring-music.git
+    uri: git@github.com:mwright-pivotal/concourse-spring-music.git
     branch: master
     private_key: {{music_private_key}}
+    username: mwright-pivotal
+    password: newuser1
 
 - name: version
   type: semver
   source:
+    endpoint: {{s3-endpoint}}
     bucket: music-pipeline-artifacts
     key: current-version
     access_key_id: {{s3-access-key-id}}
@@ -22,6 +25,7 @@ resources:
     regexp: spring-music-(.*).war
     access_key_id: {{s3-access-key-id}}
     secret_access_key: {{s3-secret-access-key}}
+    endpoint: {{s3-endpoint}}
 
 jobs:
 - name: unit
@@ -43,7 +47,7 @@ jobs:
     file: music-repo/ci/tasks/build-artifact.yml
     timeout: 5m
   - put: music-release
-    params: {from: music-repo/build/libs/spring-music-.*.war}
+    params: {file: build-output/spring-music-*.war}
   - put: music-repo
     params:
       repository: music-repo
@@ -64,17 +68,17 @@ jobs:
     file: music-repo/ci/tasks/cf-deployment.yml
     config:
       params:
-        API_ENDPOINT: api.10.65.233.228.xip.io
-        USERNAME: admin
-        PASSWORD: admin
-        ORG: test-org
-        SPACE: cats
+        API_ENDPOINT: api.cf.wrightcode.net
+        USERNAME: mwright@pivotal.io
+        PASSWORD: p1v0tal
+        ORG: wright-org
+        SPACE: CI
         HOST: music-cats
   - task: cats
     file: music-repo/ci/tasks/cats.yml
     config:
       params:
-        MUSIC_URL: http://music-cats.10.65.233.228.xip.io
+        MUSIC_URL: http://music-cats.cf.wrightcode.net
 
 - name: promote-to-uat
   plan:
@@ -89,10 +93,10 @@ jobs:
     file: music-repo/ci/tasks/cf-deployment.yml
     config:
       params:
-        API_ENDPOINT: api.10.65.233.228.xip.io
-        USERNAME: admin
-        PASSWORD: admin
-        ORG: test-org
+        API_ENDPOINT: api.cf.wrightcode.net
+        USERNAME: mwright@pivotal.io
+        PASSWORD: p1v0tal
+        ORG: wright-org
         SPACE: uat
         HOST: music-uat
 
@@ -108,9 +112,9 @@ jobs:
     file: music-repo/ci/tasks/cf-deployment.yml
     config:
       params:
-        API_ENDPOINT: api.10.65.233.228.xip.io
-        USERNAME: admin
-        PASSWORD: admin
-        ORG: test-org
+        API_ENDPOINT: api.cf.wrightcode.et
+        USERNAME: mwright@pivotal.io
+        PASSWORD: p1v0tal
+        ORG: wright-org
         SPACE: prod
         HOST: music
